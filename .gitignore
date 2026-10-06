@@ -1,0 +1,11 @@
+*.iso
+SLES_519.33
+assets/
+asm/
+extract/
+*.ninja
+permuter_settings.toml
+*.d
+*.ld
+*.rom
+*.splache

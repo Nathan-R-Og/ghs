@@ -1,0 +1,58 @@
+name: Gregory Horror Show
+#sha1: 8676819aa0edc9f1b5efcdd1c0c97934da5b6528
+sha1: 753574b0dd650e09411d0e9d103990379a8ab908
+options:
+  basename: SLES_519.33
+  target_path: SLES_519.33.rom
+  elf_path: build/eu/SLES_519.33.elf
+  base_path: ..
+
+  platform: ps2
+  compiler: EEGCC
+
+  asm_path: asm
+  src_path: src
+  build_path: build/eu
+
+  ld_script_path: SLES_519.33.ld
+  ld_dependencies: True
+  ld_wildcard_sections: True
+  ld_bss_contains_common: True
+
+  create_asm_dependencies: True
+  generate_asm_macros_files: False
+  find_file_boundaries: False
+  disasm_unknown: True
+  named_regs_for_c_funcs: False
+  mips_abi_gpr: numeric
+  hasm_in_src_path: True
+  subalign: 8
+  #gp_value: 0x48db00
+
+  symbol_addrs_path:
+  - config/eu/symbol_addrs.txt
+  - config/eu/lib_symbol_addrs.txt
+
+  create_undefined_funcs_auto: True
+  undefined_funcs_auto_path: config/eu/undefined_funcs_auto.txt
+  create_undefined_syms_auto: True
+  undefined_syms_auto_path: config/eu/undefined_syms_auto.txt
+
+  string_encoding: ASCII
+  data_string_encoding: ASCII
+  rodata_string_guesser_level: 2
+  data_string_guesser_level: 2
+
+  #section_order: [ ".text", ".data", ".rodata", ".bss" ]
+  #auto_link_sections: [ ".data", ".rodata", ".bss" ]
+
+segments:
+  - name: main
+    type: code
+    start: 0x0
+    vram: 0x100000
+    bss_size: 0x1e1500
+    subsegments:
+    - [ 0x0, asm, rom]
+
+  - [ 0x33B000, databin, rom2]
