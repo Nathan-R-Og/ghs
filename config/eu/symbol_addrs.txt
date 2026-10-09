@@ -1,0 +1,1 @@
+playerDataInit = 0x0012c2a0; // type:func

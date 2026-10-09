@@ -2,9 +2,12 @@
 SLES_519.33
 assets/
 asm/
-extract/
+volume/
+build/
 *.ninja
+.ninja_log
 permuter_settings.toml
+ctx.c
 *.d
 *.ld
 *.rom

@@ -1,14 +1,15 @@
 name: Gregory Horror Show
-#sha1: 8676819aa0edc9f1b5efcdd1c0c97934da5b6528
 sha1: 753574b0dd650e09411d0e9d103990379a8ab908
 options:
   basename: SLES_519.33
   target_path: SLES_519.33.rom
   elf_path: build/eu/SLES_519.33.elf
   base_path: ..
-
   platform: ps2
   compiler: EEGCC
+
+  # gp_value: 0x0043B770
+  # ld_gp_expression:
 
   asm_path: asm
   src_path: src
@@ -27,24 +28,53 @@ options:
   mips_abi_gpr: numeric
   hasm_in_src_path: True
   subalign: 8
-  #gp_value: 0x48db00
+  o_as_suffix: True
 
   symbol_addrs_path:
   - config/eu/symbol_addrs.txt
   - config/eu/lib_symbol_addrs.txt
+  reloc_addrs_path:
+    - config/eu/reloc_addrs.txt
+
+  # undefined_funcs_auto_path: undefined_funcs_auto.txt
+  # undefined_syms_auto_path: undefined_syms_auto.txt
 
   create_undefined_funcs_auto: True
   undefined_funcs_auto_path: config/eu/undefined_funcs_auto.txt
   create_undefined_syms_auto: True
   undefined_syms_auto_path: config/eu/undefined_syms_auto.txt
+  extensions_path: tools/splat_ext
 
   string_encoding: ASCII
   data_string_encoding: ASCII
   rodata_string_guesser_level: 2
   data_string_guesser_level: 2
 
-  #section_order: [ ".text", ".data", ".rodata", ".bss" ]
-  #auto_link_sections: [ ".data", ".rodata", ".bss" ]
+  section_order:
+    - .text
+    # - .vutext
+    - .data
+    # - .vudata
+    - .rodata
+    - .gcc_except_table
+    - .lit8
+    - .lit4
+    - .sdata
+    - .sbss
+    - .bss
+    # - .vubss
+
+  auto_link_sections:
+    - .data
+    # - .vudata
+    - .rodata
+    - .gcc_except_table
+    - .lit8
+    - .lit4
+    - .sdata
+    - .sbss
+    - .bss
+    # - .vubss
 
 segments:
   - name: main
@@ -53,6 +83,7 @@ segments:
     vram: 0x100000
     bss_size: 0x1e1500
     subsegments:
-    - [ 0x0, asm, rom]
-
-  - [ 0x33B000, databin, rom2]
+    - [0x0, asm, rom]
+    - [0x2C2A0, c, playerDataInit]
+    - [0x2C7F0, data, rom2]
+  - [0x33B880]

@@ -19,8 +19,8 @@ ROOT = Path(__file__).parent.resolve()
 TOOLS_DIR = ROOT / "tools"
 
 VERSIONS = {
-    "eu": ("SLES_519.33", "s"),
-    "fm": ("SLPS_251.98", "s"),
+    "eu": ("SLES_519.33", "Gregory Horror Show"),
+    "jp": ("SLPS_251.98", "Gregory Horror Show: Soul Collector"),
 }
 
 CROSS = "mips-linux-gnu-"
@@ -73,6 +73,7 @@ class Paths:
         self.elf = f"{self.build_dir}/{basename}.elf"
         self.map = f"{self.build_dir}/{basename}.map"
         self.rom = f"{self.build_dir}/{basename}.rom"
+        self.iso = f"{self.build_dir}/{_}.iso"
         self.checksum = f"{self.config_dir}/checksum.sha1"
 
 
@@ -229,6 +230,12 @@ def build_stuff(paths: Paths, linker_entries: List[LinkerEntry]):
         command=f"{CROSS}objcopy $in $out -O binary --gap-fill=0x00",
     )
 
+    ninja.rule(
+        "iso",
+        description="iso $in $out",
+        command=f"python3 {TOOLS_DIR}/repack.py $in $out",
+    )
+
     for entry in linker_entries:
         seg = entry.segment
 
@@ -272,28 +279,15 @@ def build_stuff(paths: Paths, linker_entries: List[LinkerEntry]):
             print(f"ERROR: Unsupported build segment type {seg.type}")
             sys.exit(1)
 
-    ninja.build(
-        paths.elf,
-        "ld",
-        paths.ld_script,
-        implicit=[str(obj) for obj in built_objects],
-        variables={"mapfile": paths.map},
+    o_files = [str(obj) for obj in built_objects]
+
+    build(Path(paths.elf), [Path(paths.ld_script)], "ld",
+        {"mapfile": paths.map}, o_files
     )
 
-    ninja.build(
-        paths.rom,
-        "rom",
-        paths.elf,
-    )
-
-    ninja.build(
-        paths.rom + ".ok",
-        "sha1sum",
-        paths.checksum,
-        implicit=[paths.rom],
-    )
-
-    ninja.default(paths.rom + ".ok")
+    build(Path(paths.rom), [Path(paths.elf)], "rom")
+    build(Path(paths.iso), [Path(paths.rom)], "iso")
+    build(Path(paths.rom+".ok"), [Path(paths.checksum)], "sha1sum", implicit=[paths.rom])
 
 
 if __name__ == "__main__":
@@ -319,8 +313,8 @@ if __name__ == "__main__":
         clean(paths)
 
     print(
-        f"Kingdom Hearts De:Compiled ~ Generating build configuration for "
-        f"{VERSIONS[args.version][1]} edition ({paths.basename})"
+        f"Splitting "
+        f"{VERSIONS[args.version][1]} ({paths.basename})"
     )
 
     extract_rom(paths)

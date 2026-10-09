@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Debian and derivatives (apt)
+if cat /etc/os-release | grep -E 'ID=debian|ID_LIKE=(.*)debian' &> /dev/null; then
+    supported=true
+    echo "Installing packages for Debian or derivative (apt)"
+    sudo apt update
+    sudo apt -y install python3 python3-pip ipython3
+    sudo apt install -y gcc
+    sudo apt-get install -y gcc-mips-linux-gnu
+    sudo apt-get install -y binutils-mips-linux-gnu
+    sudo apt-get install -y mips-linux-gnu
+    sudo apt-get install -y gcc-multilib
+    sudo wget -qO /usr/local/bin/ninja.gz https://github.com/ninja-build/ninja/releases/latest/download/ninja-linux.zip
+    sudo gunzip /usr/local/bin/ninja.gz
+    sudo chmod a+x /usr/local/bin/ninja
+    #sudo wget -qO tools/ps2iso https://github.com/anasrar/ps2iso/releases/download/v0.0.3/ps2iso_linux
+    #sudo chmod a+x ./tools/ps2iso
+    pip install -U -r requirements.txt
+
+fi
